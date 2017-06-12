@@ -1,6 +1,10 @@
 jQuery Tokeninput ChangeLog
 ===========================
 
+Version 1.8.0 (2017-06-12)
+--------------------------
+- Added new parameter `accentInsensitive` to highlight results in accent insensitive mode
+
 Version 1.6.0 (2011-08-07)
 --------------------------
 - Now possible to pass a function as the URL to search, allowing dynamic endpoints

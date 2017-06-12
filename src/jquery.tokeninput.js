@@ -1,13 +1,18 @@
 /*
  * jQuery Plugin: Tokenizing Autocomplete Text Entry
+
+ * Forked by vitorccs
+ * Version 1.8.0 (2017-06-12)
+ * Added support to highlight terms in accent insensitive mode
+
+ * Original by James Smith
  * Version 1.6.2
- *
  * Copyright (c) 2009 James Smith (http://loopj.com)
  * Licensed jointly under the GPL and MIT licenses,
  * choose which one suits your project best!
- *
  */
-;(function ($) {
+
+(function ($) {
   var DEFAULT_SETTINGS = {
     // Search settings
     method: "GET",
@@ -19,6 +24,7 @@
     contentType: "json",
     excludeCurrent: false,
     excludeCurrentParameter: "x",
+    accentInsensitive: false,
 
     // Prepopulation settings
     prePopulate: null,
@@ -828,15 +834,34 @@
           return term.replace(regexp_special_chars, '\\$&');
       }
 
-      // Highlight the query part of the search term
+      function case_insensitive(str) {
+          var normalized = str;
+
+          // map equivalent chars
+          normalized = normalized.replace(/[aãáàâ]/gi, '[aãáàâ]');
+          normalized = normalized.replace(/[eẽéèê]/gi, '[eẽéèê]');
+          normalized = normalized.replace(/[iĩíìî]/gi, '[iĩíìî]');
+          normalized = normalized.replace(/[oõóòô]/gi, '[oõóòô]');
+          normalized = normalized.replace(/[uũúùû]/gi, '[uũúùû]');
+          normalized = normalized.replace(/[cç]/gi, '[cç]');
+
+          return normalized;
+      }
+
       function highlight_term(value, term) {
+          var escaped = regexp_escape(term);
+
+          if ($(input).data("settings").accentInsensitive) {
+              escaped = case_insensitive(escaped);
+          }
+
           return value.replace(
-            new RegExp(
-              "(?![^&;]+;)(?!<[^<>]*)(" + regexp_escape(term) + ")(?![^<>]*>)(?![^&;]+;)",
-              "gi"
-            ), function(match, p1) {
-              return "<b>" + escapeHTML(p1) + "</b>";
-            }
+              new RegExp(
+                  "(?![^&;]+;)(?!<[^<>]*)(" + escaped + ")(?![^<>]*>)(?![^&;]+;)",
+                  "gi"
+              ), function(match, p1) {
+                  return "<b>" + escapeHTML(p1) + "</b>";
+              }
           );
       }
 
